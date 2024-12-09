@@ -44,14 +44,14 @@ def run():
             payload = requests.get(URL, allow_redirects=True, headers={"User-Agent": "Chrome/102.0.0.0"})
             html_page = BeautifulSoup(payload.content, "html.parser")
             print(f'download started for {key}')
-            # extract_judgments(html_page)
+            extract_judgments(html_page)
             pagination_links = html_page.find_all('a', attrs={'class': 'pagination__page-link'})
             if len(pagination_links) > 0:
                 last_page = int(pagination_links[-1]['href'].split('page=')[1])
             else:
                 last_page = 1
             if last_page > 1:
-                for i in tqdm(range(500, last_page + 1)):
+                for i in tqdm(range(2, last_page + 1)):
                     URL = f'{URL}&page={i}'
                     payload = requests.get(URL, allow_redirects=True, headers={"User-Agent": "Chrome/102.0.0.0"})
                     html_page = BeautifulSoup(payload.content, "html.parser")
