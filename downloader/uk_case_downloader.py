@@ -38,7 +38,7 @@ def extract_judgments(html_page, total_count=None):
             with open(f'data/uk{folder_path}/{doc_name}', "w", encoding="utf-8") as file:
                 file.write(xml_page.prettify())
                 total_count += 1
-            time.sleep(0.2)
+        time.sleep(0.3)
     return total_count
 
 
@@ -58,7 +58,7 @@ def run():
                 last_page = 1
             if last_page > 1:
                 for i in tqdm(range(2, last_page + 1)):
-                    URL = f'{URL}&page={i}'
+                    URL = f'{base_path}{link}&page={i}'
                     payload = requests.get(URL, allow_redirects=True, headers={"User-Agent": "Chrome/102.0.0.0"})
                     html_page = BeautifulSoup(payload.content, "html.parser")
                     total_count = extract_judgments(html_page, total_count)

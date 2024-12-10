@@ -21,7 +21,7 @@ def count_files(base_path):
     return result
 
 
-base_path = r"D:\Projects\citation-analysis\data\uk"  # Adjust this path if necessary
+base_path = r"C:\Users\dolamull\PycharmProjects\citation-analysis\data\uk"  # Adjust this path if necessary
 file_counts = count_files(base_path)
 
 # Display the result
