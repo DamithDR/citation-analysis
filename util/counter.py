@@ -1,23 +1,32 @@
 import os
-from collections import defaultdict
 
 
-def count_files_by_root_folder(root_path):
-    folder_totals = defaultdict(int)  # Dictionary to store totals per immediate folder
+def count_files(base_path):
+    result = {}
 
-    for dirpath, dirnames, filenames in os.walk(root_path):
-        # Get the immediate root folder (first-level child of `root_path`)
-        relative_path = os.path.relpath(dirpath, root_path)
-        immediate_root = relative_path.split(os.sep)[0]  # Get the top-level folder name
+    for court in os.listdir(base_path):
+        court_path = os.path.join(base_path, court)
+        if os.path.isdir(court_path):
+            court_count = 0
+            court_data = {}
+            for division in os.listdir(court_path):
+                division_path = os.path.join(court_path, division)
+                if os.path.isdir(division_path):
+                    division_count = 0
+                    for root, _, files in os.walk(division_path):
+                        division_count += len(files)
+                    court_data[division] = division_count
+                    court_count += division_count
+            result[court] = {'total': court_count, 'divisions': court_data}
+    return result
 
-        # Add file count to the respective immediate root folder
-        folder_totals[immediate_root] += len(filenames)
 
-    # Print the totals
-    for folder, total in folder_totals.items():
-        print(f"Folder: {folder} | Total Files: {total}")
+base_path = r"D:\Projects\citation-analysis\data\uk"  # Adjust this path if necessary
+file_counts = count_files(base_path)
 
-
-# Set the root directory (adjust this path to your root project directory)
-root_dir = r"D:\Projects\citation-analysis\data\uk"
-count_files_by_root_folder(root_dir)
+# Display the result
+for court, data in file_counts.items():
+    print(f"Court: {court}")
+    print(f"  Total files: {data['total']}")
+    for division, count in data['divisions'].items():
+        print(f"    Division {division}: {count} files")
