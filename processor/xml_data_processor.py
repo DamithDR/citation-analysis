@@ -2,6 +2,8 @@ import re
 
 from bs4 import BeautifulSoup
 
+from processor.citation_extractor import extract_neutral_citations
+
 
 def clean_paragraph_text(text):
     # Remove multiple spaces and replace them with a single space
@@ -10,7 +12,6 @@ def clean_paragraph_text(text):
 
 
 def run():
-
     with open('data/uk/uksc/2011/39.xml', 'r') as file:
         xml_data = file.read()
     main = BeautifulSoup(xml_data, 'xml')
@@ -28,13 +29,14 @@ def run():
     judgment_title = soup.find('span', style=lambda s: s and "font-weight:bold;font-size:20pt" in s).text.strip()
     parties = {
         "appellant": soup.find('party', attrs={'as': '#appellant'}).text.strip(),
-        "respondent": soup.find('party',attrs={'as': "#respondent"} ).text.strip()
+        "respondent": soup.find('party', attrs={'as': "#respondent"}).text.strip()
     }
     roles = {
         "appellant_role": soup.find('role', refersTo="#appellant").text.strip(),
         "respondent_role": soup.find('role', refersTo="#respondent").text.strip()
     }
-    judges = [judge.text.strip() for judge in soup.find_all('span', style=lambda s: s and "font-weight:bold;font-size:17pt" in s)]
+    judges = [judge.text.strip() for judge in
+              soup.find_all('span', style=lambda s: s and "font-weight:bold;font-size:17pt" in s)]
     judgment_date = soup.find('docDate')['date']
     heard_on = soup.find('span', style=lambda s: s and "font-weight:bold;font-size:15pt" in s).text.strip()
 
@@ -48,7 +50,6 @@ def run():
     print("Term:", term)
     print("Neutral Citation:", neutral_citation)
     print("Appeal From:", appeal_from)
-    print("Judgment Title:", judgment_title)
     print("Parties:", parties)
     print("Roles:", roles)
     print("Judges:", judges)
@@ -61,9 +62,13 @@ def run():
     # paragraphs = extract_paragraphs(text)
 
     for para in paragraphs:
-        print(para.findNext('num').text.strip())
-        print(clean_paragraph_text(para.text.strip()))
-        print('===========================================================')
+        paragraph_number = para.findNext('num').text.strip()
+
+        clearn_paragraph = clean_paragraph_text(para.text.strip())
+        neutral_citations = extract_neutral_citations(clearn_paragraph)
+        print(clearn_paragraph)
+        for citation in neutral_citations:
+            print(citation)
 
 
 if __name__ == '__main__':
