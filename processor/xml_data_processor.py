@@ -12,7 +12,7 @@ def clean_paragraph_text(text):
 
 
 def run():
-    with open('data/uk/uksc/2011/39.xml', 'r') as file:
+    with open('data/uk/ukut/aac/2011/289.xml', 'r',encoding='utf-8') as file:
         xml_data = file.read()
     main = BeautifulSoup(xml_data, 'xml')
 
