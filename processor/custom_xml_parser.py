@@ -8,7 +8,8 @@ def extract_data(main):
     paragraphs, no_text_paragraphs, full_text = get_paragraphs_with_citations(main)
     with_text_object = {'neutral_citation': citation, 'judgment_date': date, 'url': url, 'paragraphs': paragraphs,
                         'full_text': full_text}
-    without_text_object = {'neutral_citation': citation, 'judgment_date': date, 'paragraphs': no_text_paragraphs}
+    without_text_object = {'neutral_citation': citation, 'judgment_date': date, 'url': url,
+                           'paragraphs': no_text_paragraphs}
     return with_text_object, without_text_object
 
 
@@ -36,10 +37,17 @@ def get_url(main):
     return main.find('FRBRExpression').find('FRBRuri')['value'].strip()
 
 
-def extract_eu_citations(para):
-    pattern = r'\(\d{4}\) \d{1,2} EHRR \d+'  # simple but need to improve
+def extract_other_citations(para):
+    pattern = r'\(\d{4}\) \d{1,2} [A-Z]+ \d+'  # simple but need to improve
     citations = re.findall(pattern, para)
     return citations
+
+
+def remove_citations_from_text(para, citation_types):
+    for citation_type in citation_types:
+        for citation in citation_type:
+            para = para.replace(citation, 'CITATION')  # remove citation from original text
+    return para
 
 
 def get_paragraphs_with_citations(main):
@@ -55,10 +63,13 @@ def get_paragraphs_with_citations(main):
             para_number = para_number.text.strip()
             para = clean_paragraph_text(para.text.strip())
             neutral_citations = extract_neutral_citations(para)
-            european_citations = extract_eu_citations(para)
-            paragraphs_dict[para_number] = {'paragraph': para, 'citations': neutral_citations,
-                                            'eu_citations': european_citations}
-            no_text_paragraphs_dict[para_number] = {'citations': neutral_citations, 'eu_citations': european_citations}
+            other_citations = extract_other_citations(para)
+
+            para = remove_citations_from_text(para, [neutral_citations, other_citations])
+            paragraphs_dict[para_number] = {'paragraph': para, 'neutral_citations': neutral_citations,
+                                            'other_citations': other_citations}
+            no_text_paragraphs_dict[para_number] = {'neutral_citations': neutral_citations,
+                                                    'other_citations': other_citations}
             full_text += "\n" + para
         else:
             continue

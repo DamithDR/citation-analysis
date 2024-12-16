@@ -1,3 +1,8 @@
+import concurrent.futures
+import json
+import os
+from pathlib import Path
+
 from bs4 import BeautifulSoup
 
 from processor.custom_xml_parser import extract_data
@@ -10,21 +15,36 @@ def pre_process(main):
     return main
 
 
-def run():
-    root_directory = 'data/uk/'
-    xml_files = find_xml_files(root_directory)
-    # xml_files=['data/uk/uksc/2024/9.xml']
-    print(f'found {len(xml_files)} xml files')
-    for file_path in xml_files:
-        print(file_path)
-        with open(file_path, 'r', encoding='utf-8') as file:
-            xml_data = file.read()
-        main = BeautifulSoup(xml_data, 'xml')
+def save_annotations(without_text_object, path_split, alias):
+    path_split[0] = alias
+    file_path = '/'.join(path_split[:len(path_split) - 1])
+    if not os.path.exists(file_path):
+        path = Path(file_path)
+        path.mkdir(parents=True, exist_ok=True)
+    file_path = '/'.join(path_split)
+    with open(file_path, 'w', encoding='utf-8') as json_file:
+        json.dump(without_text_object, json_file, ensure_ascii=False, indent=4)
 
-        with_text_object, without_text_object = extract_data(main)
 
-        print(without_text_object)
+def run(file_path):
+    with open(file_path, 'r', encoding='utf-8') as file:
+        xml_data = file.read()
+    main = BeautifulSoup(xml_data, 'xml')
+
+    with_text_object, without_text_object = extract_data(main)
+    splitting_path = file_path.replace('\\', '/')
+    path_split = splitting_path.split('/')
+
+    path_split[len(path_split) - 1] = path_split[-1].split('.xml')[0] + '.json'
+    save_annotations(without_text_object, path_split, 'public_annotation')
+    save_annotations(with_text_object, path_split, 'experiment_annotation')
 
 
 if __name__ == '__main__':
-    run()
+    root_directory = 'data/uk/'
+    xml_files = find_xml_files(root_directory)
+    # xml_files=['data/uk/uksc/2024/9.xml'] #testing purpose
+    print(f'found {len(xml_files)} xml files')
+    with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+        # Submit tasks to the executor for concurrent processing
+        executor.map(run, xml_files)
