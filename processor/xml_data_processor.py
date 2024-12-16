@@ -1,9 +1,11 @@
 import concurrent.futures
 import json
 import os
+from concurrent.futures import as_completed
 from pathlib import Path
 
 from bs4 import BeautifulSoup
+from tqdm import tqdm
 
 from processor.custom_xml_parser import extract_data
 from util.file_handle import find_xml_files
@@ -41,10 +43,13 @@ def run(file_path):
 
 
 if __name__ == '__main__':
-    root_directory = 'data/uk/'
+    root_directory = 'data/uk'
     xml_files = find_xml_files(root_directory)
-    # xml_files=['data/uk/uksc/2024/9.xml'] #testing purpose
+    # xml_files=['data/uk/uksc/2017/2.xml'] #testing purpose
     print(f'found {len(xml_files)} xml files')
     with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
-        # Submit tasks to the executor for concurrent processing
-        executor.map(run, xml_files)
+        future_to_task = {executor.submit(run, task): task for task in xml_files}
+
+        # Wrap the as_completed iterator with tqdm for a progress bar
+        for future in tqdm(as_completed(future_to_task), total=len(future_to_task)):
+            result = future.result()  # Get the result of the completed task
