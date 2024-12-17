@@ -16,13 +16,17 @@ def extract_data(main):
 def get_citation(main):
     citation = main.find('neutralCitation')
     if citation is None:
-        citation = main.find('header').find('neutralCitation')
+        if main.find('header') is not None:
+            citation = main.find('header').find('neutralCitation')
+
         if citation is not None:
             citation = citation.text.strip()
         else:
             prop = main.find('meta').find('proprietary')
             if prop is not None:
                 citation = extract_neutral_citations(prop.text)
+            else:
+                citation = None
     else:
         citation = citation.text.strip()
     return citation
