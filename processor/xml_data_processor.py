@@ -35,17 +35,15 @@ def run(file_path):
 
     try:
         with_text_object, without_text_object = extract_data(main)
+        splitting_path = file_path.replace('\\', '/')
+        path_split = splitting_path.split('/')
+
+        path_split[len(path_split) - 1] = path_split[-1].split('.xml')[0] + '.json'
+        save_annotations(without_text_object, path_split, 'public_annotation')
+        save_annotations(with_text_object, path_split, 'experiment_annotation')
     except ValueError:
         with open('no_citation.txt', 'a') as error_output:
             error_output.write(file_path + '\n')
-
-    splitting_path = file_path.replace('\\', '/')
-    path_split = splitting_path.split('/')
-
-    path_split[len(path_split) - 1] = path_split[-1].split('.xml')[0] + '.json'
-    save_annotations(without_text_object, path_split, 'public_annotation')
-    save_annotations(with_text_object, path_split, 'experiment_annotation')
-
 
 if __name__ == '__main__':
     root_directory = 'data/uk'
