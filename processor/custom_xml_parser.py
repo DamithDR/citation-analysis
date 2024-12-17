@@ -5,6 +5,8 @@ def extract_data(main):
     citation = get_citation(main)
     if citation is None:
         raise ValueError('citation not found')
+    elif isinstance(citation, list):
+        citation = citation[0]
     date = get_date(main)
     url = get_url(main)
     paragraphs, no_text_paragraphs, full_text, key_sequence = get_paragraphs_with_citations(main)

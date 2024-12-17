@@ -45,6 +45,7 @@ def run(file_path):
         with open('no_citation.txt', 'a') as error_output:
             error_output.write(file_path + '\n')
 
+
 if __name__ == '__main__':
     root_directory = 'data/uk'
     xml_files = find_xml_files(root_directory)
