@@ -31,6 +31,12 @@ def get_citation(main):
                 prop = meta.find('proprietary')
                 if prop is not None:
                     citation = extract_neutral_citations(prop.text)
+                    if len(citation) == 0:
+                        uk_cite = prop.find('uk:cite')
+                        if uk_cite is not None:
+                            citation = uk_cite.text
+                        else:
+                            citation = None
                 else:
                     citation = None
             else:
