@@ -33,7 +33,12 @@ def run(file_path):
         xml_data = file.read()
     main = BeautifulSoup(xml_data, 'xml')
 
-    with_text_object, without_text_object = extract_data(main)
+    try:
+        with_text_object, without_text_object = extract_data(main)
+    except ValueError:
+        with open('no_citation.txt', 'a') as error_output:
+            error_output.write(file_path + '\n')
+
     splitting_path = file_path.replace('\\', '/')
     path_split = splitting_path.split('/')
 

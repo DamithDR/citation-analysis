@@ -3,6 +3,8 @@ import re
 
 def extract_data(main):
     citation = get_citation(main)
+    if citation is None:
+        raise ValueError('citation not found')
     date = get_date(main)
     url = get_url(main)
     paragraphs, no_text_paragraphs, full_text, key_sequence = get_paragraphs_with_citations(main)
@@ -22,9 +24,13 @@ def get_citation(main):
         if citation is not None:
             citation = citation.text.strip()
         else:
-            prop = main.find('meta').find('proprietary')
-            if prop is not None:
-                citation = extract_neutral_citations(prop.text)
+            meta = main.find('meta')
+            if meta is not None:
+                prop = meta.find('proprietary')
+                if prop is not None:
+                    citation = extract_neutral_citations(prop.text)
+                else:
+                    citation = None
             else:
                 citation = None
     else:
