@@ -55,6 +55,10 @@ def extract_other_citations(para):
     citations.extend(re.findall(pattern, para))
     pattern2 = r"\[\d{4}\] [A-Z]{2,5} \d+"
     citations.extend(re.findall(pattern2, para))
+    pattern3 = r"\(\d{4}\) \d+ [A-Z]{2,5} \d+"
+    citations.extend(re.findall(pattern3, para))
+    pattern4 = r"\(\d{4}\) [A-Z]{2,5} \d+"
+    citations.extend(re.findall(pattern4, para))
 
     return citations
 

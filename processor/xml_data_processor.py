@@ -49,7 +49,7 @@ def run(file_path):
 if __name__ == '__main__':
     root_directory = 'data/uk'
     xml_files = find_xml_files(root_directory)
-    # xml_files=['data/uk/uksc/2017/2.xml'] #testing purpose
+    # xml_files=['data/uk/uksc/2024/9.xml'] #testing purpose
     print(f'found {len(xml_files)} xml files')
     with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
         future_to_task = {executor.submit(run, task): task for task in xml_files}
