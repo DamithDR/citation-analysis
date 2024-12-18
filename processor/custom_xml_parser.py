@@ -76,6 +76,18 @@ def remove_citations_from_text(para, citation_types):
     return para
 
 
+def find_cited_paragraph_numbers(citations, paragraph):
+    for citation in citations:
+        start_index = paragraph.find(citation)
+        end_index = start_index + len(citation)
+        paragraph_section = paragraph[
+                            end_index:(end_index + 25)]  # considering 25 characteres to extract the paragaph numbers
+        # para_pattern = r'(?i)\bpara(?:s)?\s*(\d+(?:-\d+)?(?:\s*,\s*\d+(?:-\d+)?)*)\b'
+        # para_references = re.findall(para_pattern, paragraph_section)
+        with open('paragraph_patterns.txt', 'a') as f:
+            f.write(paragraph_section + '\n')
+
+
 def get_paragraphs_with_citations(main):
     body = main.find('judgmentBody')
     paragraphs = body.find_all('paragraph', eId=True)
@@ -92,8 +104,14 @@ def get_paragraphs_with_citations(main):
             para_number = para_number.text.strip()
             para = clean_paragraph_text(para.text.strip())
             neutral_citations = extract_neutral_citations(para)
+            if len(neutral_citations) > 0:
+                find_cited_paragraph_numbers(neutral_citations, para)
+
             para = remove_citations_from_text(para, [neutral_citations])
             other_citations = extract_other_citations(para)
+
+            # if len(other_citations) > 0:
+            #     find_cited_paragraph_numbers(other_citations, para)  # todo remove after testing
             para = remove_citations_from_text(para,
                                               [other_citations])  # progressively remove citations to avoid duplicates
 
