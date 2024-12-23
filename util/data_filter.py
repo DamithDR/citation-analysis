@@ -46,7 +46,8 @@ def filter_files(alias, available_cases):
                         removed_citations += 1
 
                 data['paragraphs'][seq]['neutral_citations'] = available_citations
-                del data['paragraphs'][seq]['other_citations']
+                if 'other_citations' in data['paragraphs'][seq]:
+                    del data['paragraphs'][seq]['other_citations']
         final_dataset.append(data)
 
     print(f'total removed citations = {removed_citations}')
