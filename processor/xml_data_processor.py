@@ -1,6 +1,7 @@
 import concurrent.futures
 import json
 import os
+import traceback
 from concurrent.futures import as_completed
 from pathlib import Path
 
@@ -43,7 +44,7 @@ def run(file_path):
         save_annotations(with_text_object, path_split, 'experiment_annotation')
     except Exception as e:
         with open('errors.txt', 'a') as error_output:
-            error_output.write(f"An error occurred: {e} | {file_path}" + '\n')
+            error_output.write(f"An error occurred: {traceback.print_exc()} | {file_path} | {e}" + '\n')
 
 
 if __name__ == '__main__':
