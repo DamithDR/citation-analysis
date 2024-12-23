@@ -109,7 +109,7 @@ def extract_paragraph_numbers(text):
             else:
                 all_matches.add(match)
 
-    return list(map(int, sorted(list(all_matches))))  # Convert to integers for consistency
+    return list(map(int, sorted(map(int, all_matches))))   # Convert to integers for consistency
 
 
 def find_cited_paragraph_numbers(citations, paragraph):
