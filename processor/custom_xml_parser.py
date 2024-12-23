@@ -76,16 +76,53 @@ def remove_citations_from_text(para, citation_types):
     return para
 
 
+def extract_paragraph_numbers(text):
+    single_patterns = [
+        r'\b(?:paragraph|para(?:s)?\.?)\s*(\d+)',  # Matches "paragraph 45", "para 6", "paras. 29"
+        r'\[(\d{1,3})\]',  # Matches "[56]" but not "[2003]"
+        r'\b(?:paras?\.?)\s*(\d+)(?:\s*,\s*|\s*and\s*)(\d+)',  # Matches "paras. 29 and 31"
+        r'\(paragraph\s*(\d+)\)',  # Matches "(paragraph 52)"
+        r'\[(\d{1,3})\]\.',  # Matches "[56]." but not "[2003]."
+    ]
+
+    multi_patterns = [
+        r'\[(\d{1,3})\]\s*-\s*\[(\d{1,3})\]',  # Matches "[56]-[58]" or "[56] - [58]" but not "[2003]-[2008]"
+        r'\b(?:paragraphs?|paras?\.?)\s*(\d+)\s*(?:to|-)\s*(\d+)',  # Matches "paragraphs 45 to 60"
+    ]
+    all_matches = set()
+    for pattern in single_patterns:
+        matches = re.findall(pattern, text)
+
+        for match in matches:
+            # Flatten tuples to handle ranges or single numbers
+            if isinstance(match, tuple):
+                all_matches.update(match)
+            else:
+                all_matches.add(match)
+    for pattern in multi_patterns:
+        matches = re.findall(pattern, text)
+        for match in matches:
+            # Flatten tuples to handle ranges or single numbers
+            if isinstance(match, tuple):
+                start, end = map(int, match)
+                all_matches.update(range(start, end + 1))  # Add all numbers in the range
+            else:
+                all_matches.add(match)
+
+    return list(map(int, sorted(list(all_matches))))  # Convert to integers for consistency
+
+
 def find_cited_paragraph_numbers(citations, paragraph):
+    new_citations = []
     for citation in citations:
         start_index = paragraph.find(citation)
         end_index = start_index + len(citation)
         paragraph_section = paragraph[
-                            end_index:(end_index + 25)]  # considering 25 characteres to extract the paragaph numbers
-        # para_pattern = r'(?i)\bpara(?:s)?\s*(\d+(?:-\d+)?(?:\s*,\s*\d+(?:-\d+)?)*)\b'
-        # para_references = re.findall(para_pattern, paragraph_section)
-        with open('paragraph_patterns.txt', 'a') as f:
-            f.write(paragraph_section + '\n')
+                            end_index:(end_index + 10)]  # considering 25 characteres to extract the paragaph numbers
+
+        numbers = extract_paragraph_numbers(paragraph_section)
+        new_citations.append({'citation': citation, 'paragraphs': numbers})
+    return new_citations
 
 
 def get_paragraphs_with_citations(main):
@@ -103,23 +140,26 @@ def get_paragraphs_with_citations(main):
         if para_number is not None:
             para_number = para_number.text.strip()
             para = clean_paragraph_text(para.text.strip())
+
+            # related to neutral citations
             neutral_citations = extract_neutral_citations(para)
             if len(neutral_citations) > 0:
-                find_cited_paragraph_numbers(neutral_citations, para)
-
+                citations_with_paragraphs = find_cited_paragraph_numbers(neutral_citations, para)
+            else:
+                citations_with_paragraphs = neutral_citations
             para = remove_citations_from_text(para, [neutral_citations])
-            other_citations = extract_other_citations(para)
 
-            # if len(other_citations) > 0:
-            #     find_cited_paragraph_numbers(other_citations, para)  # todo remove after testing
+            # related to other citations
+            other_citations = extract_other_citations(para)
             para = remove_citations_from_text(para,
                                               [other_citations])  # progressively remove citations to avoid duplicates
 
             if para_number in paragraphs_dict.keys():
                 para_number = f'{para_number}_{para_number}'
-            paragraphs_dict[para_number] = {'paragraph': para, 'neutral_citations': neutral_citations,
+            paragraphs_dict[para_number] = {'paragraph': para, 'neutral_citations': citations_with_paragraphs,
                                             'other_citations': other_citations}
-            no_text_paragraphs_dict[para_number] = {'neutral_citations': neutral_citations,
+            no_text_paragraphs_dict[para_number] = {'neutral_citations': citations_with_paragraphs,
+                                                    # 'neutral_citation_paragraphs': citations_with_paragraphs,
                                                     'other_citations': other_citations}
             full_text.append(para)
             key_sequence.append(para_number)
