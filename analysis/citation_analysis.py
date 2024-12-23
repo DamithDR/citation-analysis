@@ -36,6 +36,17 @@ if __name__ == '__main__':
     print(f'all file available citations : {len(available_cases)}')
     print(f'all neutral citations  : {len(neutral_citations)}')
     print(f'all other citations : {len(other_citations)}')
+    print(f'cited neutral paras : {len(cited_neutral_paras)}')
     avail_neutral = available_cases.intersection(neutral_citations)
     print(f'files available neutral citations : {len(avail_neutral)}')
     print(f'total duplicates : {len(duplicates)}')
+
+    avail_para_citations = cited_neutral_paras.keys()
+    avail_para_cases = available_cases.intersection(avail_para_citations)
+    print(f'files avail_para_cases : {len(avail_para_cases)}')
+
+    total_avail_paras = 0
+    for case in avail_para_cases:
+        total_avail_paras += len(cited_neutral_paras[case])
+
+    print(f'files avail_paras for retreival : {total_avail_paras}')
