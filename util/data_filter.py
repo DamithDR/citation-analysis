@@ -7,8 +7,8 @@ from util.file_handle import find_json_files
 
 def load_available_files(alias):
     root_directory = f'{alias}/uk'
-    json_files = find_json_files(root_directory)
-    # json_files = ['public_annotation/uk/uksc/2024/9.json']  # testing purposes
+    # json_files = find_json_files(root_directory)
+    json_files = ['public_annotation/uk/uksc/2024/9.json']  # testing purposes
 
     print(f'found {len(json_files)} json files')
 
@@ -28,8 +28,8 @@ def load_available_files(alias):
 
 def filter_files(alias, available_cases):
     root_directory = f'{alias}/uk'
-    json_files = find_json_files(root_directory)
-    # json_files = ['public_annotation/uk/uksc/2024/9.json']  # testing purposes
+    # json_files = find_json_files(root_directory)
+    json_files = ['public_annotation/uk/uksc/2024/9.json']  # testing purposes
 
     removed_citations = 0
     final_dataset = []
@@ -46,7 +46,9 @@ def filter_files(alias, available_cases):
                         removed_citations += 1
 
                 data['paragraphs'][seq]['neutral_citations'] = available_citations
+                del data['paragraphs'][seq]['other_citations']
         final_dataset.append(data)
+
     print(f'total removed citations = {removed_citations}')
     save_path = f'dataset/{alias}.json'
     with open(save_path, 'w', encoding='utf-8') as json_file:

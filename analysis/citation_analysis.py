@@ -55,4 +55,4 @@ if __name__ == '__main__':
     for case in avail_para_cases:
         total_avail_paras += len(cited_neutral_paras[case])
 
-    print(f'files avail_paras for retreival : {total_avail_paras}')
+    print(f'files avail_paras for retrieval : {total_avail_paras}')
