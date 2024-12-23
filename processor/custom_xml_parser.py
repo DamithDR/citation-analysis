@@ -96,7 +96,8 @@ def extract_paragraph_numbers(text):
         for match in matches:
             # Flatten tuples to handle ranges or single numbers
             if isinstance(match, tuple):
-                all_matches.update(int(match))
+                start, end = map(int, match)
+                all_matches.update(range(start, end + 1))
             else:
                 all_matches.add(int(match))
     for pattern in multi_patterns:
