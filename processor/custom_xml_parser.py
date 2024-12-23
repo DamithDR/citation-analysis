@@ -96,9 +96,9 @@ def extract_paragraph_numbers(text):
         for match in matches:
             # Flatten tuples to handle ranges or single numbers
             if isinstance(match, tuple):
-                all_matches.update(match)
+                all_matches.update(int(match))
             else:
-                all_matches.add(match)
+                all_matches.add(int(match))
     for pattern in multi_patterns:
         matches = re.findall(pattern, text)
         for match in matches:
@@ -107,7 +107,7 @@ def extract_paragraph_numbers(text):
                 start, end = map(int, match)
                 all_matches.update(range(start, end + 1))  # Add all numbers in the range
             else:
-                all_matches.add(match)
+                all_matches.add(int(match))
 
     return list(map(int, sorted(list(all_matches))))  # Convert to integers for consistency
 

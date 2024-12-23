@@ -14,6 +14,7 @@ if __name__ == '__main__':
     neutral_citations = set()
     other_citations = set()
     duplicates = []
+    cited_neutral_paras = {}
     for file_name in tqdm(json_files):
         with open(file_name, 'r', encoding="utf-8") as f:
             data = json.loads(f.read())
@@ -24,7 +25,12 @@ if __name__ == '__main__':
             available_cases.add(data['neutral_citation'])
             sequence = data['sequence']
             for key in sequence:
-                neutral_citations.update(data['paragraphs'][key]['neutral_citations'])
+                if len(data['paragraphs'][key]['neutral_citations']) != 0:
+                    citations_list = data['paragraphs'][key]['neutral_citations']
+                    for cite in citations_list:
+                        neutral_citations.add(cite['citation'])
+                        cited_neutral_paras[cite['citation']] = cite['paragraphs']
+
                 other_citations.update(data['paragraphs'][key]['other_citations'])
 
     print(f'all file available citations : {len(available_cases)}')
