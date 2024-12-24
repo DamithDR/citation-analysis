@@ -1,5 +1,6 @@
 import json
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 
 dataset = 'dataset/public_annotation.json'
 
@@ -7,7 +8,8 @@ with open(dataset, 'r', encoding="utf-8") as f:
     dataset = json.loads(f.read())
 
 case_wise_total_citation_counts = []
-for data in dataset:
+no_citation_cases = 0
+for data in tqdm(dataset):
     found = False
     keys = data['sequence']
     total_citations = 0
@@ -15,9 +17,12 @@ for data in dataset:
         case_paragraph = data['paragraphs'][key]
         if len(case_paragraph['neutral_citations']) > 0:
             found = True
-            total_citations += len(case_paragraph['neutral_citations']['paragraphs'])
-    case_wise_total_citation_counts.append(total_citations)
 
+            for citation in case_paragraph['neutral_citations']:
+                total_citations += len(citation['paragraphs'])
+    if not found:
+        no_citation_cases += 1
+    case_wise_total_citation_counts.append(total_citations)
 
 # Create the histogram
 counts, bins, patches = plt.hist(case_wise_total_citation_counts, bins=5, edgecolor='black', alpha=0.7)
