@@ -9,6 +9,7 @@ with open(dataset, 'r', encoding="utf-8") as f:
 
 case_wise_total_citation_counts = []
 no_citation_cases = 0
+cases_with_any_citation = 0
 print(f'Total number of cases {len(dataset)}')
 for data in tqdm(dataset):
     found = False
@@ -23,14 +24,20 @@ for data in tqdm(dataset):
                 total_citations += len(citation['paragraphs'])
     if not found:
         no_citation_cases += 1
+    else:
+        cases_with_any_citation += 1
     case_wise_total_citation_counts.append(total_citations)
 
 # Create the histogram
 case_wise_total_citation_counts = [x for x in case_wise_total_citation_counts if x != 0]
-counts, bins, patches = plt.hist(case_wise_total_citation_counts, bins=5, edgecolor='black', alpha=0.7)
+bins = [i for i in range(0, 45)]
+counts, bins, patches = plt.hist(case_wise_total_citation_counts, bins=bins, edgecolor='black', alpha=0.7)
 
-print(f'cases without citations {no_citation_cases}')
-print(f'cases with citations {len(case_wise_total_citation_counts)}')
+print(f'cases without any citations {no_citation_cases}')
+print(f'cases without some citations {cases_with_any_citation}')
+print(f'cases with paragraph citations {len(case_wise_total_citation_counts)}')
+
+print(f'total count = {len(dataset)}')
 
 # Add labels and title
 plt.title("Histogram of Data with Frequencies")
