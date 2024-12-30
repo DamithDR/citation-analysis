@@ -27,7 +27,7 @@ def make_document_retrieval_dataset(alias):
 
         if alias == 'public':
             retrieval_object = {'case': case['neutral_citation'], 'citations': [], 'paragraph_citations': []}
-        elif alias == 'experiment':
+        else:
             retrieval_object = {'file': file, 'case': case['neutral_citation'], 'citations': [],
                                 'paragraph_citations': []}
         sequence = case['sequence']
