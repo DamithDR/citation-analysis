@@ -24,7 +24,12 @@ def make_document_retrieval_dataset(alias):
     for file in tqdm(files):
         with open(root + '/' + file, 'r', encoding='utf-8') as f:
             case = json.loads(f.read())
-        retrieval_object = {'case': case['neutral_citation'], 'citations': [], 'paragraph_citations': []}
+
+        if alias == 'public':
+            retrieval_object = {'case': case['neutral_citation'], 'citations': [], 'paragraph_citations': []}
+        elif alias == 'experiment':
+            retrieval_object = {'file': file, 'case': case['neutral_citation'], 'citations': [],
+                                'paragraph_citations': []}
         sequence = case['sequence']
         no_of_citations = 0
 
