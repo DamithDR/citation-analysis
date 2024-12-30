@@ -15,7 +15,7 @@ def load_available_files(alias):
     available_cases = set()
     duplicates = []
 
-    for file_name in tqdm(json_files):
+    for file_name in tqdm(json_files,desc='loading available files'):
         with open(file_name, 'r', encoding="utf-8") as f:
             data = json.loads(f.read())
             if available_cases.__contains__(data['neutral_citation']):
@@ -33,7 +33,7 @@ def filter_files(alias, available_cases):
 
     removed_citations = 0
     final_dataset = []
-    for file_name in tqdm(json_files):
+    for file_name in tqdm(json_files,desc='filtering and removing citations'):
         with open(file_name, 'r', encoding="utf-8") as f:
             data = json.loads(f.read())
             for seq in data['sequence']:
@@ -57,9 +57,6 @@ def filter_files(alias, available_cases):
                 json.dump(data, f, ensure_ascii=False, indent=4)
 
     print(f'total removed citations = {removed_citations}')
-    save_path = f'dataset/{alias}.json'
-    with open(save_path, 'w', encoding='utf-8') as json_file:
-        json.dump(final_dataset, json_file, ensure_ascii=False, indent=4)
 
 
 if __name__ == '__main__':
