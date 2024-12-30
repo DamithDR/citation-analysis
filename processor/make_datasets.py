@@ -2,6 +2,7 @@ import json
 import os
 
 from sklearn.model_selection import train_test_split
+from tqdm import tqdm
 
 
 def get_all_files(folder_path):
@@ -20,7 +21,7 @@ def make_document_retrieval_dataset(alias):
     gr1_less_5_citations = []
     gr5_citations = []
 
-    for file in files:
+    for file in tqdm(files):
         with open(root + '/' + file, 'r', encoding='utf-8') as f:
             case = json.loads(f.read())
         retrieval_object = {'case': case['neutral_citation'], 'citations': [], 'paragraph_citations': []}
