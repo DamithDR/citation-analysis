@@ -49,17 +49,44 @@ def make_document_retrieval_dataset(alias):
     test_size = 0.2  # 20% test
     dev_size = 0.1  # 10% dev
 
-    # Split train and temp (test + dev)
-    one_citation_train, one_citation_temp, gr1_less_5_citations_train, \
-    gr1_less_5_citations_temp, gr5_citations_train, gr5_citations_temp = train_test_split(
-        one_citation, gr1_less_5_citations, gr5_citations, test_size=(test_size + dev_size),
+    # Split for one_citation
+    one_citation_train, one_citation_temp = train_test_split(
+        one_citation,
+        test_size=(test_size + dev_size),
         random_state=42
     )
 
-    # Split temp into test and dev
-    one_citation_test, one_citation_dev, gr1_less_5_citations_test, \
-    gr1_less_5_citations_dev, gr5_citations_test, gr5_citations_dev = train_test_split(
-        one_citation_temp, gr1_less_5_citations_temp, gr5_citations_temp,
+    # Further split one_citation_temp into test and dev
+    one_citation_test, one_citation_dev = train_test_split(
+        one_citation_temp,
+        test_size=(dev_size / (test_size + dev_size)),
+        random_state=42
+    )
+
+    # Split for gr1_less_5_citations
+    gr1_less_5_citations_train, gr1_less_5_citations_temp = train_test_split(
+        gr1_less_5_citations,
+        test_size=(test_size + dev_size),
+        random_state=42
+    )
+
+    # Further split gr1_less_5_citations_temp into test and dev
+    gr1_less_5_citations_test, gr1_less_5_citations_dev = train_test_split(
+        gr1_less_5_citations_temp,
+        test_size=(dev_size / (test_size + dev_size)),
+        random_state=42
+    )
+
+    # Split for gr5_citations
+    gr5_citations_train, gr5_citations_temp = train_test_split(
+        gr5_citations,
+        test_size=(test_size + dev_size),
+        random_state=42
+    )
+
+    # Further split gr5_citations_temp into test and dev
+    gr5_citations_test, gr5_citations_dev = train_test_split(
+        gr5_citations_temp,
         test_size=(dev_size / (test_size + dev_size)),
         random_state=42
     )
