@@ -1,56 +1,52 @@
 import json
+import os
+
 from sklearn.model_selection import train_test_split
 
 
-def make_document_retrieval_dataset():
-    exp_data = 'dataset/experiment_annotation.json'
-    # pub_data = 'dataset/public_annotation_backup.json'
+def get_all_files(folder_path):
+    # List all files in the folder
+    files = os.listdir(folder_path)
+    files = [file for file in files if file.endswith('.json')]
+    return files
 
-    # with open(exp_data, 'r', encoding='utf-8') as f:
-    #     experiment_data = json.load(f)
+
+def make_document_retrieval_dataset(alias):
+    root = f'dataset/retrieval_raw_data/{alias}'
+    files = get_all_files(root)
 
     zero_citations = []
     one_citation = []
     gr1_less_5_citations = []
     gr5_citations = []
 
-    with open(exp_data, 'r', encoding='utf-8') as f:
-        experiment_data = json.load(f)
+    for file in files:
+        with open(root + '/' + file, 'r', encoding='utf-8') as f:
+            case = json.loads(f.read())
+        retrieval_object = {'case': case['neutral_citation'], 'citations': [], 'paragraph_citations': []}
+        sequence = case['sequence']
+        no_of_citations = 0
 
-        for case in experiment_data:
-            retrieval_object = {'case': case['neutral_citation'], 'citations': [], 'paragraph_citations': []}
-            sequence = case['sequence']
-            no_of_citations = 0
+        for seq_number in sequence:
+            paragraph = case['paragraphs'][seq_number]
+            if len(paragraph['neutral_citations']) > 0:
+                cited_list = paragraph['neutral_citations']
+                for citation in cited_list:
+                    retrieval_object['citations'].append(citation['citation'])
+                    retrieval_object['paragraph_citations'].append(citation)
+                    no_of_citations += len(no_of_citations['paragraphs'])
 
-            for seq_number in sequence:
-                paragraph = case['paragraphs'][seq_number]
-                if len(paragraph['neutral_citations']) > 0:
-                    cited_list = paragraph['neutral_citations']
-                    for citation in cited_list:
-                        retrieval_object['citations'].append(citation['citation'])
-                        retrieval_object['paragraph_citations'].append(citation)
-                        no_of_citations += len(no_of_citations['paragraphs'])
+        if no_of_citations == 0:
+            continue  # takes too much memory, and we don't need these
+        elif no_of_citations == 1:
+            one_citation.append(retrieval_object)
+        elif no_of_citations < 5:
+            gr1_less_5_citations.append(retrieval_object)
+        elif no_of_citations > 5:
+            gr5_citations.append(retrieval_object)
 
-            if no_of_citations == 0:
-                zero_citations.append(retrieval_object)
-            elif no_of_citations == 1:
-                one_citation.append(retrieval_object)
-            elif no_of_citations < 5:
-                gr1_less_5_citations.append(retrieval_object)
-            elif no_of_citations > 5:
-                gr5_citations.append(retrieval_object)
-
-    # divide train,test and dev sets
-    # train_test_split(zero_citations, test_size=30)
-    # Split proportions
-    train_size = 0.7  # 70% train
     test_size = 0.2  # 20% test
     dev_size = 0.1  # 10% dev
-
-    # zero_citations = []
-    # one_citation = []
-    # gr1_less_5_citations = []
-    # gr5_citations = []
 
     # Split train and temp (test + dev)
     one_citation_train, one_citation_temp, gr1_less_5_citations_train, \
@@ -76,8 +72,18 @@ def make_document_retrieval_dataset():
     dev_data = one_citation_dev + gr1_less_5_citations_dev + gr5_citations_dev
     test_data = one_citation_test + gr1_less_5_citations_test + gr5_citations_test
 
-    print(training_data)
+    print(f'Training set size : {len(training_data)}')
+    print(f'Dev set size : {len(dev_data)}')
+    print(f'Test set size : {len(test_data)}')
+
+    with open(f'dataset/retrieval/{alias}/training.json', 'w', encoding='utf-8') as f:
+        json.dump(training_data, f, ensure_ascii=False, indent=4)
+    with open(f'dataset/retrieval/{alias}/dev.json', 'w', encoding='utf-8') as f:
+        json.dump(dev_data, f, ensure_ascii=False, indent=4)
+    with open(f'dataset/retrieval/{alias}/test.json', 'w', encoding='utf-8') as f:
+        json.dump(test_data, f, ensure_ascii=False, indent=4)
 
 
 if __name__ == '__main__':
-    make_document_retrieval_dataset()
+    make_document_retrieval_dataset('public')
+    make_document_retrieval_dataset('experiment')
