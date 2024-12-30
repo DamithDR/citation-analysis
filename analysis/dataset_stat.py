@@ -2,7 +2,7 @@ import json
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 
-dataset = 'dataset/public_annotation.json'
+dataset = 'dataset/public_annotation_backup.json'
 
 with open(dataset, 'r', encoding="utf-8") as f:
     dataset = json.loads(f.read())

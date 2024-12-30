@@ -48,7 +48,13 @@ def filter_files(alias, available_cases):
                 data['paragraphs'][seq]['neutral_citations'] = available_citations
                 if 'other_citations' in data['paragraphs'][seq]:
                     del data['paragraphs'][seq]['other_citations']
-        final_dataset.append(data)
+        save_name = file_name.split('uk\\')[1].replace('\\', '_')
+        if alias == 'public_annotation':
+            with open(f'dataset/retrieval_raw_data/public/{save_name}', 'w', encoding='utf-8') as f:
+                json.dump(data, f, ensure_ascii=False, indent=4)
+        elif alias == 'experiment_annotation':
+            with open(f'dataset/retrieval_raw_data/public/{save_name}', 'w', encoding='utf-8') as f:
+                json.dump(data, f, ensure_ascii=False, indent=4)
 
     print(f'total removed citations = {removed_citations}')
     save_path = f'dataset/{alias}.json'
