@@ -53,7 +53,7 @@ def filter_files(alias, available_cases):
             with open(f'dataset/retrieval_raw_data/public/{save_name}', 'w', encoding='utf-8') as f:
                 json.dump(data, f, ensure_ascii=False, indent=4)
         elif alias == 'experiment_annotation':
-            with open(f'dataset/retrieval_raw_data/public/{save_name}', 'w', encoding='utf-8') as f:
+            with open(f'dataset/retrieval_raw_data/experiment/{save_name}', 'w', encoding='utf-8') as f:
                 json.dump(data, f, ensure_ascii=False, indent=4)
 
     print(f'total removed citations = {removed_citations}')
