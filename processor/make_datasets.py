@@ -34,7 +34,7 @@ def make_document_retrieval_dataset(alias):
                 for citation in cited_list:
                     retrieval_object['citations'].append(citation['citation'])
                     retrieval_object['paragraph_citations'].append(citation)
-                    no_of_citations += len(no_of_citations['paragraphs'])
+                    no_of_citations += len(citation['paragraphs'])
 
         if no_of_citations == 0:
             continue  # takes too much memory, and we don't need these
