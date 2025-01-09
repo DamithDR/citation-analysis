@@ -12,11 +12,10 @@ def get_all_files(folder_path):
     return files
 
 
-def make_document_retrieval_dataset(alias):
+def categorise_data(alias):
     root = f'dataset/retrieval_raw_data/{alias}'
     files = get_all_files(root)
 
-    zero_citations = []
     one_citation = []
     gr1_less_5_citations = []
     gr5_citations = []
@@ -25,11 +24,7 @@ def make_document_retrieval_dataset(alias):
         with open(root + '/' + file, 'r', encoding='utf-8') as f:
             case = json.loads(f.read())
 
-        if alias == 'public':
-            retrieval_object = {'case': case['neutral_citation'], 'citations': [], 'paragraph_citations': []}
-        else:
-            retrieval_object = {'file': file, 'case': case['neutral_citation'], 'citations': [],
-                                'paragraph_citations': []}
+        retrieval_object = {'case': case['neutral_citation'], 'citations': [], 'paragraph_citations': []}
         sequence = case['sequence']
         no_of_citations = 0
 
@@ -39,7 +34,8 @@ def make_document_retrieval_dataset(alias):
                 cited_list = paragraph['neutral_citations']
                 for citation in cited_list:
                     retrieval_object['citations'].append(citation['citation'])
-                    retrieval_object['paragraph_citations'].append(citation)
+                    paragraph_linked_citation = {'para': seq_number, 'citation': citation}
+                    retrieval_object['paragraph_citations'].append(paragraph_linked_citation)
                     no_of_citations += len(citation['paragraphs'])
 
         if no_of_citations == 0:
@@ -50,6 +46,11 @@ def make_document_retrieval_dataset(alias):
             gr1_less_5_citations.append(retrieval_object)
         elif no_of_citations > 5:
             gr5_citations.append(retrieval_object)
+    return one_citation, gr1_less_5_citations, gr5_citations
+
+
+def make_document_retrieval_dataset(alias):
+    one_citation, gr1_less_5_citations, gr5_citations = categorise_data(alias)
 
     test_size = 0.2  # 20% test
     dev_size = 0.1  # 10% dev
@@ -96,7 +97,6 @@ def make_document_retrieval_dataset(alias):
         random_state=42
     )
 
-    print(f'Total | Zero {len(zero_citations)}')
     print(f'Total | One {len(one_citation)}')
     print(f'Total | 1 < C < 5 {len(gr1_less_5_citations)}')
     print(f'Total | C > 5  {len(gr5_citations)}')
@@ -119,4 +119,6 @@ def make_document_retrieval_dataset(alias):
 
 if __name__ == '__main__':
     make_document_retrieval_dataset('public')
-    make_document_retrieval_dataset('experiment')
+    # make_document_retrieval_dataset('experiment')
+
+    # make_passage_retrieval_dataset('public')
