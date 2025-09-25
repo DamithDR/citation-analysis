@@ -47,7 +47,7 @@ def categorise_data(alias):
             continue  # takes too much memory, and we don't need these
         elif no_of_citations == 1:
             one_citation.append(retrieval_object)
-        elif no_of_citations < 5:
+        elif no_of_citations <= 5:
             gr1_less_5_citations.append(retrieval_object)
         elif no_of_citations > 5:
             gr5_citations.append(retrieval_object)
