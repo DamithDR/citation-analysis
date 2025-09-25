@@ -115,6 +115,9 @@ def make_document_retrieval_dataset(alias):
     test_data = one_citation_test + gr1_less_5_citations_test + gr5_citations_test
     random.shuffle(test_data)
 
+    candidates = training_data + dev_data + test_data
+    random.shuffle(candidates)
+
     print(f'Training set size : {len(training_data)}')
     print(f'Dev set size : {len(dev_data)}')
     print(f'Test set size : {len(test_data)}')
@@ -124,6 +127,10 @@ def make_document_retrieval_dataset(alias):
     with open(f'dataset/retrieval/{alias}/dev.json', 'w', encoding='utf-8') as f:
         json.dump(dev_data, f, ensure_ascii=False, indent=4)
     with open(f'dataset/retrieval/{alias}/test.json', 'w', encoding='utf-8') as f:
+        json.dump(test_data, f, ensure_ascii=False, indent=4)
+    with open(f'dataset/retrieval/{alias}/candidates.json', 'w', encoding='utf-8') as f:
+        json.dump(candidates, f, ensure_ascii=False, indent=4)
+    with open(f'dataset/retrieval/{alias}/queries.json', 'w', encoding='utf-8') as f:
         json.dump(test_data, f, ensure_ascii=False, indent=4)
 
 
