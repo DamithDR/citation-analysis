@@ -65,20 +65,6 @@ def make_document_retrieval_dataset(alias):
     test_size = 0.2  # 20% test
     dev_size = 0.1  # 10% dev
 
-    # Split for no_citation
-    no_citation_train, no_citation_temp = train_test_split(
-        no_citation,
-        test_size=(test_size + dev_size),
-        random_state=42
-    )
-
-    # Further split no_citation_temp into test and dev
-    no_citation_test, no_citation_dev = train_test_split(
-        no_citation_temp,
-        test_size=(dev_size / (test_size + dev_size)),
-        random_state=42
-    )
-
 
     # Split for one_citation
     one_citation_train, one_citation_temp = train_test_split(
@@ -122,11 +108,11 @@ def make_document_retrieval_dataset(alias):
         random_state=42
     )
 
-    training_data = no_citation_train + one_citation_train + gr1_less_5_citations_train + gr5_citations_train
+    training_data = no_citation + one_citation_train + gr1_less_5_citations_train + gr5_citations_train
     random.shuffle(training_data)
-    dev_data = no_citation_dev + one_citation_dev + gr1_less_5_citations_dev + gr5_citations_dev
+    dev_data = one_citation_dev + gr1_less_5_citations_dev + gr5_citations_dev
     random.shuffle(dev_data)
-    test_data = no_citation_test + one_citation_test + gr1_less_5_citations_test + gr5_citations_test
+    test_data = one_citation_test + gr1_less_5_citations_test + gr5_citations_test
     random.shuffle(test_data)
 
     print(f'Training set size : {len(training_data)}')
