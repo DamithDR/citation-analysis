@@ -108,7 +108,8 @@ def make_document_retrieval_dataset(alias):
         random_state=42
     )
 
-    training_data = no_citation + one_citation_train + gr1_less_5_citations_train + gr5_citations_train
+    training_data = one_citation_train + gr1_less_5_citations_train + gr5_citations_train
+    # training_data = no_citation + one_citation_train + gr1_less_5_citations_train + gr5_citations_train
     random.shuffle(training_data)
     dev_data = one_citation_dev + gr1_less_5_citations_dev + gr5_citations_dev
     random.shuffle(dev_data)
